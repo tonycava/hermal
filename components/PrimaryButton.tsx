@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleProp, Text, TextStyle, TouchableOpacity, ViewSt
 type CustomButtonProps = {
 	title: string;
 	handlePress?: () => void;
-	containerStyles: string
+	containerStyles?: string
 	textStyles?: string;
 	isLoading?: boolean;
 }

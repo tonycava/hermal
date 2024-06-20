@@ -1,33 +1,62 @@
 import { useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
+import { View, Text, ScrollView, Dimensions, Image } from "react-native";
 
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/PrimaryButton";
-import { LoginForm } from "@/app/lib/dto/auth.dto";
+import { LoginForm } from "@/common/dto/auth.dto";
+import { ApiResponse } from "@/common/interfaces/ApiResponse";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COOKEYS } from "@/common/utils";
+import axios from "axios"
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { jwtDecode } from "jwt-decode";
 
+type LoginError = {
+	email?: string;
+	password?: string;
+	server?: string;
+}
 
-const SignIn = () => {
+const Login = () => {
+	const { setUser } = useGlobalContext();
 	const [isSubmitting, setSubmitting] = useState<boolean>(false);
-	const [form, setForm] = useState<LoginForm>({
-		email: "",
-		password: "",
-	});
+	const [error, setError] = useState<LoginError | null>(null);
+	const [form, setForm] = useState<LoginForm>({ email: "", password: "", });
 
-	const submit = async () => {
-		if (form.email === "" || form.password === "") {
-			Alert.alert("Error", "Please fill in all fields");
-		}
-
+	const onLogin = async () => {
 		setSubmitting(true);
 
 		try {
-			Alert.alert("Success", "User signed in successfully");
-			router.replace("/");
-		} catch (error) {
+			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/login', form);
 
-		} finally {
+			console.log(data)
+			if (data.status === 400) {
+				setError({
+					email: data.data["email"],
+					password: data.data["password"],
+					server: ""
+				});
+
+				setSubmitting(false);
+				return;
+			}
+
+			await AsyncStorage.setItem(COOKEYS.JWT_TOKEN, data.data);
+			const user = jwtDecode(data.data);
+			setUser(user);
+			setSubmitting(false);
+			router.push("/");
+		} catch (error) {
+			console.log("Error", error);
+
+			setError({
+				email: "",
+				password: "",
+				server: "Internal server error, please try again later."
+			})
+
 			setSubmitting(false);
 		}
 	};
@@ -58,27 +87,32 @@ const SignIn = () => {
 						keyboardType="email-address"
 					/>
 
+					<Text>{error?.email ?? ""}</Text>
+
 					<InputField
 						title="Password"
 						value={form.password}
+						type="password"
 						handleChangeText={(password: string) => setForm({ ...form, password })}
 						otherStyles="mt-7"
 					/>
+					<Text>{error?.password ?? ""}</Text>
 
 					<CustomButton
 						title="Login"
-						handlePress={submit}
+						handlePress={onLogin}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
 					/>
 
+					<Text>{error?.server ?? ""}</Text>
 
 					<View className="fixed bottom-0 right-10 mb-9 p-2 flex justify-center pt-5 flex-row gap-2">
 						<Text className="text-lg text-[#18534F] font-pregular">
 							Don't have an account?
 						</Text>
 						<Link
-							href="/sign-up"
+							href="/register"
 							className="text-lg font-psemibold text-secondary"
 						>
 							Register
@@ -98,4 +132,4 @@ const SignIn = () => {
 	);
 };
 
-export default SignIn;
+export default Login;
