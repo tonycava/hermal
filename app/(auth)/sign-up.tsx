@@ -6,23 +6,57 @@ import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 import { images } from "@/constants";
 import InputField from "@/components/InputField";
 import PrimaryButton from "@/components/PrimaryButton";
-import { RegisterForm } from "@/app/lib/dto/auth.dto";
+import { RegisterForm } from "@/common/dto/auth.dto";
+import axios from "axios";
+import { ApiResponse } from "@/common/interfaces/ApiResponse";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COOKEYS } from "@/common/utils";
+
+type RegisterError = {
+	email?: string;
+	password?: string;
+	confirmPassword?: string;
+	server?: string;
+}
 
 const SignUp = () => {
 	const [isSubmitting, setSubmitting] = useState<boolean>(false);
-	const [form, setForm] = useState<RegisterForm>({
-		username: "",
-		email: "",
-		password: "",
-	});
+	const [error, setError] = useState<RegisterError | null>(null);
+	const [form, setForm] = useState<RegisterForm>({ username: "", email: "", password: "", confirmPassword: "" });
 
-	const submit = async () => {
+	const onRegister = async () => {
 		setSubmitting(true);
 
-		router.replace("/");
+		try {
+			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/register', form);
 
-		setSubmitting(false);
+			if (data.status === 400) {
+				setError({
+					email: data.data["email"],
+					password: data.data["password"],
+					confirmPassword: data.data["confirmPassword"],
+					server: ""
+				});
 
+				setSubmitting(false);
+				return;
+			}
+
+			await AsyncStorage.setItem(COOKEYS.JWT_TOKEN, data.data);
+			setSubmitting(false);
+			router.push("/");
+		} catch (error) {
+			console.log("Error", error);
+
+			setError({
+				email: "",
+				confirmPassword: "",
+				password: "",
+				server: "Internal server error, please try again later."
+			})
+
+			setSubmitting(false);
+		}
 	};
 
 	return (
@@ -40,19 +74,14 @@ const SignUp = () => {
 					</Text>
 
 					<InputField
-						title="Username"
-						value={form.username}
-						handleChangeText={(username: string) => setForm({ ...form, username })}
-						otherStyles="mt-10"
-					/>
-
-					<InputField
 						title="Email"
 						value={form.email}
 						handleChangeText={(email: string) => setForm({ ...form, email })}
 						otherStyles="mt-7"
 						keyboardType="email-address"
 					/>
+
+					<Text>{error?.email ?? ""}</Text>
 
 					<InputField
 						title="Password"
@@ -61,19 +90,26 @@ const SignUp = () => {
 						otherStyles="mt-7"
 					/>
 
+					<Text>{error?.password ?? ""}</Text>
+
+
 					<InputField
 						title="Confirm Password"
 						value={form.password}
 						handleChangeText={(password: string) => setForm({ ...form, password })}
 						otherStyles="mt-7"
 					/>
+					<Text>{error?.confirmPassword ?? ""}</Text>
+
 
 					<PrimaryButton
 						title="Register"
-						handlePress={submit}
+						handlePress={onRegister}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
 					/>
+
+					<Text>{error?.server ?? ""}</Text>
 
 					<View className="flex justify-center pt-5 flex-row gap-2">
 						<Text className="text-lg text-[#18534F] font-pregular">
