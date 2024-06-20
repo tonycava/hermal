@@ -28,9 +28,9 @@ const InputField = ({
 			<Text className="text-base text-black font-pmedium">{title}</Text>
 
 			<View
-				className="w-full h-16 px-4 rounded-2xl border-[#18534F] border-4 focus:border-secondary flex flex-row items-center">
+				className="w-full h-16 px-4 rounded-2xl border-[#18534F] border-4 flex flex-row items-center">
 				<TextInput
-					className="flex-1 text-white font-psemibold text-base"
+					className="flex-1 text-black font-semibold text-base outline-none"
 					style={
 						{
 							width: "97%",
@@ -44,7 +44,7 @@ const InputField = ({
 					{...props}
 				/>
 
-				{title === "Password" && (
+				{(title === "Password" || title === "Confirm Password") && (
 					<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
 						<Image
 							source={!showPassword ? icons.eye : icons.eyeHide}
