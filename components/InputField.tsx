@@ -28,6 +28,11 @@ const InputField = ({
 			<View className="w-full h-16 px-4 rounded-2xl border-[#18534F] border-4 focus:border-secondary flex flex-row items-center">
 				<TextInput
 					className="flex-1 text-white font-psemibold text-base"
+					style={
+						{
+							width: "97%",
+						}
+					}
 					value={value}
 					placeholder={placeholder}
 					placeholderTextColor="#7B7B8B"
@@ -40,11 +45,12 @@ const InputField = ({
 					<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
 						<Image
 							source={!showPassword ? icons.eye : icons.eyeHide}
-							className="w-6 h-6"
+							className="w-4 h-4"
 							resizeMode="contain"
 						/>
 					</TouchableOpacity>
 				)}
+
 			</View>
 		</View>
 	);

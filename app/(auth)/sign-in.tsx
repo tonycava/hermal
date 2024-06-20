@@ -33,23 +33,18 @@ const SignIn = () => {
 	};
 
 	return (
-		<SafeAreaView className="relative h-full">
+		<SafeAreaView className="h-full overflow-hidden">
 			<ScrollView>
+				<Image
+					source={require("@/assets/svg/rond.svg")}
+					className=" fixed -top-12 -right-12 w-48 h-48"
+				/>
 				<View
-					className="w-full flex justify-center h-full px-4 my-6"
+					className="w-full md:w-1/2 flex justify-center h-full self-center px-4 overflow-hidden"
 					style={{
 						minHeight: Dimensions.get("window").height - 100,
 					}}
 				>
-					<Image
-						source={require("@/assets/svg/rond.svg")}
-						style={{
-							width: 100,
-							height: 100,
-							resizeMode: "contain",
-						}}
-						className="mt-10"
-					/>
 
 					<Text className="flex justify-center text-2xl font-semibold text-[#D6955B] mt-10 font-psemibold">
 						Hermal
@@ -78,7 +73,7 @@ const SignIn = () => {
 					/>
 
 
-					<View className="fixed bottom-0 right-10 m-2 p-2 flex justify-center pt-5 flex-row gap-2">
+					<View className="fixed bottom-0 right-10 mb-9 p-2 flex justify-center pt-5 flex-row gap-2">
 						<Text className="text-lg text-[#18534F] font-pregular">
 							Don't have an account?
 						</Text>
@@ -91,6 +86,14 @@ const SignIn = () => {
 					</View>
 				</View>
 			</ScrollView>
+			<Image
+				source={require("@/assets/svg/rond.svg")}
+				className=" fixed -bottom-12 -left-12 w-48 h-48"
+			/>
+			<Image
+				source={require("@/assets/svg/rond.svg")}
+				className=" fixed -bottom-16 w-48 h-48"
+			/>
 		</SafeAreaView>
 	);
 };

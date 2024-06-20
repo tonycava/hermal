@@ -26,10 +26,18 @@ const SignUp = () => {
 	};
 
 	return (
-		<SafeAreaView className="h-full">
+		<SafeAreaView className="h-full overflow-hidden">
 			<ScrollView>
+				<Image
+					source={require("@/assets/svg/rond.svg")}
+					className=" fixed -left-16 w-48 h-48"
+				/>
+				<Image
+					source={require("@/assets/svg/rond.svg")}
+					className=" fixed -top-12 -left-8 w-48 h-48"
+				/>
 				<View
-					className="w-full flex justify-center h-full px-4 my-6"
+					className="w-full md:w-1/2 md:h-1/2 flex justify-center self-center h-full px-4 my-6"
 					style={{
 						minHeight: Dimensions.get("window").height - 100,
 					}}
@@ -88,6 +96,10 @@ const SignUp = () => {
 					</View>
 				</View>
 			</ScrollView>
+			<Image
+				source={require("@/assets/svg/rond.svg")}
+				className=" fixed -bottom-12 -right-12 w-48 h-48"
+			/>
 		</SafeAreaView>
 	);
 };
