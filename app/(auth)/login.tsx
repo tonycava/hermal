@@ -97,6 +97,7 @@ const Login = () => {
 					<InputField
 						title="Password"
 						value={form.password}
+						type="password"
 						handleChangeText={(password: string) => setForm({ ...form, password })}
 						otherStyles="mt-7"
 					/>

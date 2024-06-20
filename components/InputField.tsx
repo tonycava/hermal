@@ -7,32 +7,35 @@ type InputFieldProps = {
 	title: string;
 	value: string;
 	placeholder: string;
+	type: "text" | "password";
 	handleChangeText: (text: string) => void;
 	otherStyle?: string;
 } & InputHTMLAttributes<HTMLInputElement>
 
 const InputField = ({
-	                   title,
-	                   value,
-	                   placeholder,
-	                   handleChangeText,
-	                   otherStyles,
-	                   ...props
-                   }: any) => {
+	                    title,
+	                    value,
+	                    placeholder,
+	                    handleChangeText,
+	                    otherStyles,
+	                    type = "text",
+	                    ...props
+                    }: any) => {
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 
 	return (
 		<View className={`space-y-2 ${otherStyles}`}>
 			<Text className="text-base text-black font-pmedium">{title}</Text>
 
-			<View className="w-full h-16 px-4 rounded-2xl border-[#18534F] border-4 focus:border-secondary flex flex-row items-center">
+			<View
+				className="w-full h-16 px-4 rounded-2xl border-[#18534F] border-4 focus:border-secondary flex flex-row items-center">
 				<TextInput
 					className="flex-1 text-white font-psemibold text-base"
 					value={value}
 					placeholder={placeholder}
 					placeholderTextColor="#7B7B8B"
 					onChangeText={handleChangeText}
-					secureTextEntry={title === "Password" && !showPassword}
+					secureTextEntry={type === "password" && !showPassword}
 					{...props}
 				/>
 

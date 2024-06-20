@@ -91,6 +91,7 @@ const Register = () => {
 					<InputField
 						title="Password"
 						value={form.password}
+						type="password"
 						handleChangeText={(password: string) => setForm({ ...form, password })}
 						otherStyles="mt-7"
 					/>
@@ -100,6 +101,7 @@ const Register = () => {
 
 					<InputField
 						title="Confirm Password"
+						type="password"
 						value={form.confirmPassword}
 						handleChangeText={(confirmPassword: string) => setForm({ ...form, confirmPassword })}
 						otherStyles="mt-7"
