@@ -1,37 +1,43 @@
 import { useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, ScrollView, Dimensions, Image } from "react-native";
+import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 
+import { images } from "@/constants";
 import InputField from "@/components/InputField";
-import CustomButton from "@/components/PrimaryButton";
-import { LoginForm } from "@/common/dto/auth.dto";
+import PrimaryButton from "@/components/PrimaryButton";
+import { RegisterForm } from "@/common/dto/auth.dto";
+import axios from "axios";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COOKEYS } from "@/common/utils";
-import axios from "axios"
+import { jwtDecode } from "jwt-decode";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
-type LoginError = {
+type RegisterError = {
 	email?: string;
 	password?: string;
+	confirmPassword?: string;
 	server?: string;
 }
 
-const SignIn = () => {
+const Register = () => {
+	const { setUser } = useGlobalContext();
 	const [isSubmitting, setSubmitting] = useState<boolean>(false);
-	const [error, setError] = useState<LoginError | null>(null);
-	const [form, setForm] = useState<LoginForm>({ email: "", password: "", });
+	const [error, setError] = useState<RegisterError | null>(null);
+	const [form, setForm] = useState<RegisterForm>({ username: "", email: "", password: "", confirmPassword: "" });
 
-	const onLogin = async () => {
+	const onRegister = async () => {
 		setSubmitting(true);
 
 		try {
-			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/login', form);
+			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/register', form);
 
 			if (data.status === 400) {
 				setError({
 					email: data.data["email"],
 					password: data.data["password"],
+					confirmPassword: data.data["confirmPassword"],
 					server: ""
 				});
 
@@ -40,6 +46,8 @@ const SignIn = () => {
 			}
 
 			await AsyncStorage.setItem(COOKEYS.JWT_TOKEN, data.data);
+			const user = jwtDecode(data.data);
+			setUser(user);
 			setSubmitting(false);
 			router.push("/");
 		} catch (error) {
@@ -47,6 +55,7 @@ const SignIn = () => {
 
 			setError({
 				email: "",
+				confirmPassword: "",
 				password: "",
 				server: "Internal server error, please try again later."
 			})
@@ -56,7 +65,7 @@ const SignIn = () => {
 	};
 
 	return (
-		<SafeAreaView className="relative h-full">
+		<SafeAreaView className="h-full">
 			<ScrollView>
 				<View
 					className="w-full flex justify-center h-full px-4 my-6"
@@ -64,15 +73,6 @@ const SignIn = () => {
 						minHeight: Dimensions.get("window").height - 100,
 					}}
 				>
-					<Image
-						source={require("@/assets/svg/rond.svg")}
-						style={{
-							width: 100,
-							height: 100,
-							resizeMode: "contain",
-						}}
-						className="mt-10"
-					/>
 
 					<Text className="flex justify-center text-2xl font-semibold text-[#D6955B] mt-10 font-psemibold">
 						Hermal
@@ -94,26 +94,37 @@ const SignIn = () => {
 						handleChangeText={(password: string) => setForm({ ...form, password })}
 						otherStyles="mt-7"
 					/>
+
 					<Text>{error?.password ?? ""}</Text>
 
-					<CustomButton
-						title="Login"
-						handlePress={onLogin}
+
+					<InputField
+						title="Confirm Password"
+						value={form.confirmPassword}
+						handleChangeText={(confirmPassword: string) => setForm({ ...form, confirmPassword })}
+						otherStyles="mt-7"
+					/>
+					<Text>{error?.confirmPassword ?? ""}</Text>
+
+
+					<PrimaryButton
+						title="Register"
+						handlePress={onRegister}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
 					/>
 
 					<Text>{error?.server ?? ""}</Text>
 
-					<View className="absolute bottom-0 right-10 m-2 p-2 flex justify-center pt-5 flex-row gap-2">
+					<View className="flex justify-center pt-5 flex-row gap-2">
 						<Text className="text-lg text-[#18534F] font-pregular">
-							Don't have an account?
+							Have an account already?
 						</Text>
 						<Link
-							href="/sign-up"
+							href="/login"
 							className="text-lg font-psemibold text-secondary"
 						>
-							Register
+							Login
 						</Link>
 					</View>
 				</View>
@@ -122,4 +133,4 @@ const SignIn = () => {
 	);
 };
 
-export default SignIn;
+export default Register;

@@ -1,13 +1,14 @@
-import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, useContext, useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COOKEYS } from "@/common/utils";
 import { jwtDecode } from "jwt-decode";
 
 type Context = {
-	user: User | null
+	user: User | null;
+	setUser: Dispatch<any>
 }
 
-const GlobalContext = createContext<Context>({ user: null });
+const GlobalContext = createContext<Context>({ user: null, setUser: () => null });
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
@@ -31,6 +32,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
 		<GlobalContext.Provider
 			value={{
 				user,
+				setUser
 			}}
 		>
 			{children}

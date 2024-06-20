@@ -4,7 +4,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 
 const AuthLayout = () => {
 	const { user } = useGlobalContext();
-	if (user) return <Redirect href="/home" />;
+	if (user) return <Redirect href="/" />;
 
 	return (
 		<>
