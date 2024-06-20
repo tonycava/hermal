@@ -6,8 +6,8 @@ import { Link } from "expo-router";
 const Home = () => {
 	return (
 		<View className="flex-1 items-center justify-center bg-white">
-			<Text className="font-pblack">Open up App.js to start working on your app!</Text>
-			<Link href="/sign-in">Siogn in</Link>
+
+			<Link href="/sign-in">Sign in</Link>
 			<StatusBar style="auto"/>
 		</View>
 	)

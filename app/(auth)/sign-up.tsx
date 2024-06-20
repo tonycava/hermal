@@ -19,14 +19,14 @@ const SignUp = () => {
 	const submit = async () => {
 		setSubmitting(true);
 
-		router.replace("/home");
+		router.replace("/");
 
 		setSubmitting(false);
 
 	};
 
 	return (
-		<SafeAreaView className="bg-primary h-full">
+		<SafeAreaView className="h-full">
 			<ScrollView>
 				<View
 					className="w-full flex justify-center h-full px-4 my-6"
@@ -34,14 +34,9 @@ const SignUp = () => {
 						minHeight: Dimensions.get("window").height - 100,
 					}}
 				>
-					<Image
-						source={images.logo}
-						resizeMode="contain"
-						className="w-[115px] h-[34px]"
-					/>
 
-					<Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
-						Sign Up to Hermal
+					<Text className="flex justify-center text-2xl font-semibold text-[#D6955B] mt-10 font-psemibold">
+						Hermal
 					</Text>
 
 					<InputField
@@ -66,15 +61,22 @@ const SignUp = () => {
 						otherStyles="mt-7"
 					/>
 
+					<InputField
+						title="Confirm Password"
+						value={form.password}
+						handleChangeText={(password: string) => setForm({ ...form, password })}
+						otherStyles="mt-7"
+					/>
+
 					<PrimaryButton
-						title="Sign Up"
+						title="Register"
 						handlePress={submit}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
 					/>
 
 					<View className="flex justify-center pt-5 flex-row gap-2">
-						<Text className="text-lg text-gray-100 font-pregular">
+						<Text className="text-lg text-[#18534F] font-pregular">
 							Have an account already?
 						</Text>
 						<Link

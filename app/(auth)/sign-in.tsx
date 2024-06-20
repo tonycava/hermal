@@ -3,7 +3,6 @@ import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 
-import { images } from "@/constants";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/PrimaryButton";
 import { LoginForm } from "@/app/lib/dto/auth.dto";
@@ -25,7 +24,7 @@ const SignIn = () => {
 
 		try {
 			Alert.alert("Success", "User signed in successfully");
-			router.replace("/home");
+			router.replace("/");
 		} catch (error) {
 
 		} finally {
@@ -34,7 +33,7 @@ const SignIn = () => {
 	};
 
 	return (
-		<SafeAreaView className="bg-primary h-full">
+		<SafeAreaView className="relative h-full">
 			<ScrollView>
 				<View
 					className="w-full flex justify-center h-full px-4 my-6"
@@ -43,13 +42,17 @@ const SignIn = () => {
 					}}
 				>
 					<Image
-						source={images.logo}
-						resizeMode="contain"
-						className="w-[115px] h-[34px]"
+						source={require("@/assets/svg/rond.svg")}
+						style={{
+							width: 100,
+							height: 100,
+							resizeMode: "contain",
+						}}
+						className="mt-10"
 					/>
 
-					<Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
-						Log in to Hermal
+					<Text className="flex justify-center text-2xl font-semibold text-[#D6955B] mt-10 font-psemibold">
+						Hermal
 					</Text>
 
 					<InputField
@@ -68,22 +71,22 @@ const SignIn = () => {
 					/>
 
 					<CustomButton
-						title="Sign In"
+						title="Login"
 						handlePress={submit}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
 					/>
 
 
-					<View className="flex justify-center pt-5 flex-row gap-2">
-						<Text className="text-lg text-gray-100 font-pregular">
+					<View className="fixed bottom-0 right-10 m-2 p-2 flex justify-center pt-5 flex-row gap-2">
+						<Text className="text-lg text-[#18534F] font-pregular">
 							Don't have an account?
 						</Text>
 						<Link
 							href="/sign-up"
 							className="text-lg font-psemibold text-secondary"
 						>
-							Signup
+							Register
 						</Link>
 					</View>
 				</View>
