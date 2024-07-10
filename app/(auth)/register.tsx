@@ -15,6 +15,7 @@ import { jwtDecode } from "jwt-decode";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 type RegisterError = {
+	username?: string;
 	email?: string;
 	password?: string;
 	confirmPassword?: string;
@@ -33,8 +34,10 @@ const Register = () => {
 		try {
 			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/register', form);
 
+			console.log(data);
 			if (data.status === 400) {
 				setError({
+					username: data.data["username"],
 					email: data.data["email"],
 					password: data.data["password"],
 					confirmPassword: data.data["confirmPassword"],
@@ -54,6 +57,7 @@ const Register = () => {
 			console.log("Error", error);
 
 			setError({
+				username: "",
 				email: "",
 				confirmPassword: "",
 				password: "",
@@ -85,6 +89,15 @@ const Register = () => {
 					<Text className="flex justify-center text-2xl font-semibold text-[#D6955B] mt-10 font-psemibold">
 						Hermal
 					</Text>
+
+					<InputField
+						title="Username"
+						value={form.username}
+						handleChangeText={(username: string) => setForm({ ...form, username })}
+						otherStyles="mt-7"
+					/>
+
+					<Text>{error?.username ?? ""}</Text>
 
 					<InputField
 						title="Email"
