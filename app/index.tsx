@@ -9,7 +9,8 @@ import axios from "axios";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
 import { useEffect, useState } from "react";
 import InputField from "@/components/InputField";
-import SelectSearch from 'react-select-search';
+import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
+import PrimaryButton from "@/components/PrimaryButton";
 
 type Group = {
 	id: string;
@@ -25,15 +26,16 @@ const Home = () => {
 	const { user, setUser } = useGlobalContext();
 	const [groups, setGroups] = useState<Group[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [searchUser, setSearchUser] = useState<string>('');
-	const [users, setUsers] = useState<User[]>([]);
+	const [groupName, setGroupName] = useState<string>('');
+	const [options, setOptions] = useState<SelectSearchOption[]>([]);
+	const [selectedOption, setSelectedOption] = useState<SelectedOptionValue[]>([]);
 
 	useEffect(() => {
 		const getGroups = async () => {
 			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
 			if (!token) return;
 
-			const {data} = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
+			const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
 				headers: {
 					Authorization: token
 				}
@@ -45,36 +47,41 @@ const Home = () => {
 		getGroups();
 	}, []);
 
-	if (!user) return <Redirect href="/login"/>;
-
-	const options = [
-		{name: 'Swedish', value: 'sv'},
-		{name: 'English', value: 'en'},
-	];
+	if (!user) return <Redirect href="/login" />;
 
 	const addGroup = async () => {
 		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
 		if (!token) return;
 
-		const {data} = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
+		const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
+			name: groupName,
+			users: [...selectedOption, user.id]
+		}, {
 			headers: {
 				Authorization: token
 			}
 		});
 
-		console.log(data.data);
+		setGroups([...groups, data.data]);
+		setModalVisible(false);
+		return;
 	}
 
-	const getUsers = async () => {
+	const getUsers = async (query: string) => {
 		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
 		if (!token) return;
 
-		const {data} = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + searchUser, {
+		const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + query, {
 			headers: {
 				Authorization: token
 			}
 		});
-		console.log(data.data);
+		return data.data.map((user: User) => {
+			return {
+				name: user.username,
+				value: user.id
+			}
+		});
 	}
 
 	const disconnect = async () => {
@@ -98,12 +105,34 @@ const Home = () => {
 					<View className="border-4 rounded-2xl border-[#D6955B] w-3/4 h-1/3 bg-white">
 						<InputField
 							title="Nom du groupe"
-							value=""
+							value={groupName}
 							placeholder="Nom du groupe"
-							handleChangeText={() => {}}
+							handleChangeText={(newGroupName: string) => {
+								setGroupName(newGroupName);
+							}}
 							otherStyles="mt-4 mx-4"
 						/>
-						<SelectSearch options={options} search={true} multiple={true} onChange={() => {console.log('change');}} className="mt-4 mx-4"/>
+						<SelectSearch
+							options={options}
+							getOptions={getUsers}
+							search={true}
+							multiple={true}
+							debounce={500}
+							onChange={(option) => {
+								if (Array.isArray(option)) {
+									setSelectedOption(option)
+									return;
+								}
+								setSelectedOption([option]);
+							}}
+							placeholder={"Ajouter des membres"}
+							className={"mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl"}
+						/>
+						<PrimaryButton
+							title="Créer"
+							handlePress={addGroup}
+							containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
+						/>
 						<Pressable
 							className="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
 							onPress={() => setModalVisible(!modalVisible)}>
@@ -114,11 +143,12 @@ const Home = () => {
 			</Modal>
 			<Image
 				source={require("@/assets/svg/rond.svg")}
-				className=" fixed -top-12 -left-12 w-48 h-48"
+				className="fixed -top-12 -left-12 w-48 h-48"
 			/>
 
-			<div className="flex self-start w-full">
-				<Text className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
+			<View className="flex flex-row self-start w-full">
+				<Text
+					className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
 					Hermal
 				</Text>
 
@@ -129,7 +159,7 @@ const Home = () => {
 						className="w-2 h-2 aspect-square"
 					/>
 				</button>
-			</div>
+			</View>
 
 			{groups.length === 0 ? (
 				<Text className="text-2xl font-semibold mt-10">Pas de groupe</Text>
@@ -143,7 +173,7 @@ const Home = () => {
 				</View>
 			)}
 
-			<Navbar></Navbar>
+			<Navbar/>
 			<StatusBar style="auto"/>
 		</View>
 	)
