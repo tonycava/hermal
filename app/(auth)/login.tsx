@@ -12,6 +12,7 @@ import { COOKEYS } from "@/common/utils";
 import axios from "axios"
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { jwtDecode } from "jwt-decode";
+import { io } from "socket.io-client";
 
 type LoginError = {
 	email?: string;
@@ -25,6 +26,11 @@ const Login = () => {
 	const [error, setError] = useState<LoginError | null>(null);
 	const [form, setForm] = useState<LoginForm>({ email: "", password: "", });
 
+
+	const socket = io("http://127.0.0.1:3001");
+	console.log(socket.id);
+
+	socket.emit("message", { content: "test", userId: "64394c81-e5e2-47e4-8d86-c4aa82f9546d" });
 	const onLogin = async () => {
 		setSubmitting(true);
 

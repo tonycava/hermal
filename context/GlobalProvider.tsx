@@ -5,17 +5,17 @@ import { jwtDecode } from "jwt-decode";
 
 type Context = {
 	user: User | null;
-	setUser: Dispatch<any>
+	setUser: Dispatch<any>;
+	isLogged: boolean;
 }
 
-const GlobalContext = createContext<Context>({ user: null, setUser: () => null });
+const GlobalContext = createContext<Context>({ user: null, setUser: () => null, isLogged: false });
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
-	const [isLogged, setIsLogged] = useState(false);
-	const [user, setUser] = useState<any>(null);
-	const [loading, setLoading] = useState(true);
+	const [isLogged, setIsLogged] = useState<Context["isLogged"]>(false);
+	const [user, setUser] = useState<Context["user"]>(null);
 
 	useEffect(() => {
 		async function fetchUser() {
@@ -28,11 +28,16 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
 		fetchUser()
 	}, []);
 
+	useEffect(() => {
+		setIsLogged(!user);
+	}, [user]);
+
 	return (
 		<GlobalContext.Provider
 			value={{
 				user,
-				setUser
+				setUser,
+				isLogged
 			}}
 		>
 			{children}

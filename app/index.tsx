@@ -136,7 +136,7 @@ const Home = () => {
 			) : (
 				<View className="flex flex-col mt-10">
 					{groups.map((group) => (
-						<Link href={`/chats/${group.id}`} key={group.id}>
+						<Link href={`/groups/${group.id}`} key={group.id}>
 							<Text className="text-2xl font-semibold">{group.name}</Text>
 						</Link>
 					))}

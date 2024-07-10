@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
+import { View, Text, ScrollView, Dimensions, Image } from "react-native";
 
-import { images } from "@/constants";
 import InputField from "@/components/InputField";
 import PrimaryButton from "@/components/PrimaryButton";
 import { RegisterForm } from "@/common/dto/auth.dto";
@@ -32,10 +31,10 @@ const Register = () => {
 		setSubmitting(true);
 
 		try {
-			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/register', form);
+			const { data } = await axios.post<ApiResponse>('http://localhost:3000/auth/register', form);
 
 			console.log(data);
-			if (data.status === 400) {
+			if (!data.isSuccess) {
 				setError({
 					username: data.data["username"],
 					email: data.data["email"],
