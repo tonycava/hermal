@@ -100,7 +100,7 @@ const Home = () => {
 						<PrimaryButton
 							title="Créer"
 							handlePress={addGroup}
-							containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
+							containerStyles="bg-[#D6955B] rounded-xl flex flex-row justify-center items-center mt-4 mx-4"
 						/>
 						<Pressable
 							className="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"

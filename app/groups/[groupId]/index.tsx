@@ -9,10 +9,10 @@ import api from '@/common/api';
 import { ApiResponse } from '@/common/interfaces/ApiResponse';
 import { useRoute } from '@react-navigation/core';
 import { useGlobalContext } from '@/context/GlobalProvider';
-import Navbar from "@/components/Navbar";
+import Navbar from '@/components/Navbar';
 import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { COOKEYS } from "@/common/utils";
+import { useRouter } from 'expo-router';
+import { Group } from '@/common/entities/Group';
 
 type Chat = {
 	id: string;
@@ -21,14 +21,10 @@ type Chat = {
 	groupId: string;
 };
 
-type Group = {
-	id: string;
-	name: string;
-};
-
 const Chat = () => {
 	const route = useRoute();
 	const { user } = useGlobalContext();
+	const router = useRouter();
 	const { groupId } = route.params as { groupId: string };
 	const [content, setContent] = useState<string>('');
 	const [chats, setChats] = useState<Chat[]>([]);
@@ -75,34 +71,19 @@ const Chat = () => {
 	}, [socket]);
 
 	const getUsers = async (query: string) => {
-		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-		if (!token) return;
-
-		const { data } = await api.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + query, {
-			headers: {
-				Authorization: token
-			}
-		});
+		const { data } = await api.get<ApiResponse<any>>(`/chats/search-user?searchTerm=${query}`);
 		return data.data.map((user: User) => {
 			return {
 				name: user.username,
 				value: user.id
-			}
+			};
 		});
-	}
+	};
 
 	const addUserToGroup = async () => {
-		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-		if (!token) return;
-
-		const { data } = await api.put<ApiResponse<any>>(`/chats/groups/${groupId}/${selectedOption}`, {
-			headers: {
-				Authorization: token
-			}
-		});
-
+		await api.put<ApiResponse>(`/chats/groups/${groupId}/${selectedOption}`);
 		setModalVisible(false);
-	}
+	};
 
 	return (
 		<View className="flex-1 bg-white">
@@ -124,13 +105,13 @@ const Chat = () => {
 							debounce={500}
 							onChange={(option) => {
 								if (Array.isArray(option)) {
-									setSelectedOption(option)
+									setSelectedOption(option);
 									return;
 								}
 								setSelectedOption([option]);
 							}}
-							placeholder={"Ajouter des membres"}
-							className={"mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl"}
+							placeholder={'Ajouter des membres'}
+							className={'mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl'}
 						/>
 						<PrimaryButton
 							title="Ajouter"
@@ -146,25 +127,36 @@ const Chat = () => {
 				</View>
 			</Modal>
 			<Image
-				source={require("@/assets/svg/rond.svg")}
+				source={require('@/assets/svg/rond.svg')}
 				className="fixed -top-12 -left-12 w-48 h-48"
 			/>
 			<ScrollView className="flex-1">
 				{group && (
 					<View className="pt-14 flex flex-row items-center">
 						<Image
-							source={require("@/assets/images/profile.png")}
+							source={require('@/assets/images/profile.png')}
 							alt="profile picture"
 							style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
 						/>
 						<Text className="text-black text-lg font-bold ml-3">{group.name}</Text>
 						<PrimaryButton
 							title=""
-							handlePress={() => setModalVisible(true)}
-							containerStyles={"flex items-center ml-auto mr-5 px-4 rounded-full"}
+							handlePress={() => router.replace('/')}
+							containerStyles='flex items-center ml-auto mr-5 px-4 rounded-full rotate-180'
 						>
 							<Image
-								source={require("@/assets/svg/plus.svg")}
+								source={require('@/assets/svg/arrow.svg')}
+								alt="add"
+								style={{ width: 20, height: 20 }}
+							/>
+						</PrimaryButton>
+						<PrimaryButton
+							title=""
+							handlePress={() => setModalVisible(true)}
+							containerStyles={'flex items-center mr-5 px-4 rounded-full'}
+						>
+							<Image
+								source={require('@/assets/svg/plus.svg')}
 								alt="add"
 								style={{ width: 20, height: 20 }}
 							/>
@@ -173,6 +165,7 @@ const Chat = () => {
 
 				)}
 				<View className="h-2 border-b-2 border-black"/>
+				{chats.length === 0 && <Text className="text-2xl text-center mt-4">No messages have been send yet !</Text>}
 				{chats.map((chat, i) => {
 					const isCurrentUser = chat.userId === user?.id;
 					return (
@@ -195,13 +188,13 @@ const Chat = () => {
 					placeholder="Type your message here"
 					handleChangeText={(content: string) => setContent(content)}
 				/>
-				<PrimaryButton handlePress={sendMessage} title="Send" containerStyles={"ml-4 mt-2 w-14"}>
+				<PrimaryButton handlePress={sendMessage} title="Send" containerStyles={'ml-4 mt-2 w-14'}>
 					Send
 				</PrimaryButton>
 			</View>
 
-			<Navbar />
-			<StatusBar style="auto" />
+			<Navbar/>
+			<StatusBar style="auto"/>
 		</View>
 	);
 };
