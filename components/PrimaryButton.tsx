@@ -1,5 +1,5 @@
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 type CustomButtonProps = {
 	title: string;
@@ -7,6 +7,7 @@ type CustomButtonProps = {
 	containerStyles?: string
 	textStyles?: string;
 	isLoading?: boolean;
+	children?: ReactNode;
 }
 
 const CustomButton: FC<CustomButtonProps> = ({
@@ -15,6 +16,7 @@ const CustomButton: FC<CustomButtonProps> = ({
 	                      containerStyles,
 	                      textStyles,
 	                      isLoading,
+	children
                       }) => {
 	return (
 		<TouchableOpacity
@@ -28,6 +30,8 @@ const CustomButton: FC<CustomButtonProps> = ({
 			<Text className={`text-[#FEEAA1] font-semibold text-lg ${textStyles}`}>
 				{title}
 			</Text>
+
+			{children}
 
 			{isLoading && (
 				<ActivityIndicator

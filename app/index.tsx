@@ -11,53 +11,22 @@ import InputField from '@/components/InputField';
 import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
 import PrimaryButton from '@/components/PrimaryButton';
 import api from '@/common/api';
+import { ItemGroup } from '@/common/entities/Group';
+import { getConsoleOutput } from '@jest/console';
 
-type Group = {
-	id: string;
-	name: string;
-}
-
-type User = {
-	id: string;
-	username: string;
-}
-
-type Chat = {
-	id: string;
-	content: string;
-	createdAt: string;
-}
 
 const Home = () => {
 	const { user, setUser } = useGlobalContext();
-	const [groups, setGroups] = useState<Group[]>([]);
-	const [lastChats, setLastChats] = useState<{ [key: string]: Chat | null }>({});
+	const [groups, setGroups] = useState<ItemGroup[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [groupName, setGroupName] = useState<string>('');
+	const [groupName, setGroupName] = useState('');
 	const [options, setOptions] = useState<SelectSearchOption[]>([]);
 	const [selectedOption, setSelectedOption] = useState<SelectedOptionValue[]>([]);
 
 	useEffect(() => {
-		const getChatsFromGroup = async (groupId: string): Promise<Chat | null> => {
-			const { data } = await api.get<ApiResponse<any>>(`/chats/${groupId}`);
-			if (data.data.length === 0) return null;
-
-			// Trier les chats par createdAt pour trouver le plus récent
-			const sortedChats = data.data.sort((a: Chat, b: Chat) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-			return sortedChats[0];
-		};
-
 		const getGroups = async () => {
-			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-			if (!token) return;
-
 			const { data } = await api.get<ApiResponse>('/chats/groups');
 			setGroups(data.data);
-			// Récupérez le dernier chat pour chaque groupe
-			data.data.forEach(async (group: Group) => {
-				const lastChat = await getChatsFromGroup(group.id);
-				setLastChats(prev => ({ ...prev, [group.id]: lastChat }));
-			});
 		};
 		getGroups();
 	}, []);
@@ -108,9 +77,7 @@ const Home = () => {
 							title="Nom du groupe"
 							value={groupName}
 							placeholder="Nom du groupe"
-							handleChangeText={(newGroupName: string) => {
-								setGroupName(newGroupName);
-							}}
+							handleChangeText={(newGroupName: string) => setGroupName(newGroupName)}
 							otherStyles="mt-4 mx-4"
 						/>
 						<SelectSearch
@@ -153,7 +120,7 @@ const Home = () => {
 					Hermal
 				</Text>
 
-				<PrimaryButton title="testw" handlePress={() => setModalVisible(true)}
+				<PrimaryButton title="" handlePress={() => setModalVisible(true)}
 				               containerStyles={'ml-auto mt-16 mr-5 px-4 py-2 rounded-full'}>
 
 				</PrimaryButton>
@@ -170,9 +137,8 @@ const Home = () => {
 								       className="border-2 border-black rounded-full w-10 h-10"/>
 								<Text className="text-2xl font-semibold ml-4">{group.name}</Text>
 							</Link>
-							{lastChats[group.id] && (
-								<Text className="text-base text-gray-500 ml-20">{lastChats[group.id]?.content}</Text>
-							)}
+							<Text className="text-base text-gray-500 ml-20">{group.lastChat || 'No message send yet'}</Text>
+
 						</View>
 					))}
 				</View>
