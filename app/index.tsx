@@ -1,16 +1,16 @@
-import { Alert, Image, Modal, Text, View } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import { Alert, Image, Modal, Pressable, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Link, Redirect, router } from 'expo-router';
-import { useGlobalContext } from "@/context/GlobalProvider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { COOKEYS } from "@/common/utils";
-import axios from "axios";
-import { ApiResponse } from "@/common/interfaces/ApiResponse";
-import { useEffect, useState } from "react";
-import InputField from "@/components/InputField";
+import { useGlobalContext } from '@/context/GlobalProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { COOKEYS } from '@/common/utils';
+import { ApiResponse } from '@/common/interfaces/ApiResponse';
+import { useEffect, useState } from 'react';
+import InputField from '@/components/InputField';
 import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
-import PrimaryButton from "@/components/PrimaryButton";
+import PrimaryButton from '@/components/PrimaryButton';
 import api from '@/common/api';
+import Navbar from '@/components/Navbar';
 
 type Group = {
 	id: string;
@@ -32,64 +32,41 @@ const Home = () => {
 
 	useEffect(() => {
 		const getGroups = async () => {
-			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-			if (!token) return;
-
-			const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
-				headers: {
-					Authorization: token
-				}
-			});
-
-			console.log(data.data);
+			const { data } = await api.get<ApiResponse>('/chats/groups');
 			setGroups(data.data);
-		}
+		};
 		getGroups();
 	}, []);
 
-	if (!user) return <Redirect href="/login" />;
+	if (!user) return <Redirect href="/login"/>;
 
 	const addGroup = async () => {
-		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-		if (!token) return;
-
-		const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
+		const { data } = await api.post<ApiResponse<any>>('/chats/groups/create', {
 			name: groupName,
 			users: [...selectedOption, user.id]
-		}, {
-			headers: {
-				Authorization: token
-			}
 		});
 
 		setGroups([...groups, data.data]);
 		setModalVisible(false);
 		return;
-	}
+	};
 
 	const getUsers = async (query: string) => {
-		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-		if (!token) return;
-
-		const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + query, {
-			headers: {
-				Authorization: token
-			}
-		});
+		const { data } = await api.get<ApiResponse>(`http://localhost:3000/chats/search-user?searchTerm=${query}`);
 		return data.data.map((user: User) => {
 			return {
 				name: user.username,
 				value: user.id
-			}
+			};
 		});
-	}
+	};
 
 	const disconnect = async () => {
 		await AsyncStorage.removeItem(COOKEYS.JWT_TOKEN);
 		setUser(null);
 		router.push('/login');
 		return;
-	}
+	};
 
 	return (
 		<View className="flex-1 items-center bg-white">
@@ -120,13 +97,13 @@ const Home = () => {
 							debounce={500}
 							onChange={(option) => {
 								if (Array.isArray(option)) {
-									setSelectedOption(option)
+									setSelectedOption(option);
 									return;
 								}
 								setSelectedOption([option]);
 							}}
-							placeholder={"Ajouter des membres"}
-							className={"mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl"}
+							placeholder={'Ajouter des membres'}
+							className={'mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl'}
 						/>
 						<PrimaryButton
 							title="Créer"
@@ -142,17 +119,19 @@ const Home = () => {
 				</View>
 			</Modal>
 			<Image
-				source={require("@/assets/svg/rond.svg")}
+				source={require('@/assets/svg/rond.svg')}
 				className="fixed -top-12 -left-12 w-48 h-48"
 			/>
 
 			<View className="flex self-start w-full">
-				<Text className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
+				<Text
+					className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
 					Hermal
 				</Text>
 
 
-				<PrimaryButton handlePress={() => setModalVisible(true)} containerStyles="ml-auto mt-16 mr-5 px-4 py-2 rounded-full" title="test">
+				<PrimaryButton handlePress={() => setModalVisible(true)}
+				               containerStyles="ml-auto mt-16 mr-5 px-4 py-2 rounded-full" title="test">
 
 				</PrimaryButton>
 			</View>
@@ -172,7 +151,7 @@ const Home = () => {
 			<Navbar/>
 			<StatusBar style="auto"/>
 		</View>
-	)
-}
+	);
+};
 
 export default Home;
