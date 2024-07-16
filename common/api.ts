@@ -22,4 +22,15 @@ api.interceptors.request.use(
 	}
 );
 
+api.interceptors.response.use(
+	async (response) => {
+		if (response.status === 401) {
+			await AsyncStorage.removeItem(COOKEYS.JWT_TOKEN);
+		}
+
+		return response;
+	}, (error) => {
+		return Promise.reject(error);
+	});
+
 export default api;
