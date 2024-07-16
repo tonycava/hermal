@@ -8,8 +8,9 @@ import axios from "axios";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
 import { useEffect, useState } from "react";
 import InputField from "@/components/InputField";
+import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
+import PrimaryButton from "@/components/PrimaryButton";
 import api from '@/common/api';
-import PrimaryButton from '@/components/PrimaryButton';
 
 type Group = {
 	id: string;
@@ -23,16 +24,22 @@ type User = {
 
 const Home = () => {
 	const { user, setUser } = useGlobalContext();
-	if (!user) return <Redirect href="/login" />;
-
 	const [groups, setGroups] = useState<Group[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [searchUser, setSearchUser] = useState<string>('');
-	const [users, setUsers] = useState<User[]>([]);
+	const [groupName, setGroupName] = useState<string>('');
+	const [options, setOptions] = useState<SelectSearchOption[]>([]);
+	const [selectedOption, setSelectedOption] = useState<SelectedOptionValue[]>([]);
 
 	useEffect(() => {
 		const getGroups = async () => {
-			const {data} = await api.get<ApiResponse<any>>('/chats/groups');
+			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
+			if (!token) return;
+
+			const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
+				headers: {
+					Authorization: token
+				}
+			});
 
 			console.log(data.data);
 			setGroups(data.data);
@@ -40,32 +47,41 @@ const Home = () => {
 		getGroups();
 	}, []);
 
-	const options = [
-		{name: 'Swedish', value: 'sv'},
-		{name: 'English', value: 'en'},
-	];
+	if (!user) return <Redirect href="/login" />;
 
 	const addGroup = async () => {
 		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
 		if (!token) return;
 
-		const {data} = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
-			headers: { Authorization: token }
-		});
-
-		console.log(data.data);
-	}
-
-	const getUsers = async () => {
-		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-		if (!token) return;
-
-		const {data} = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + searchUser, {
+		const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
+			name: groupName,
+			users: [...selectedOption, user.id]
+		}, {
 			headers: {
 				Authorization: token
 			}
 		});
-		console.log(data.data);
+
+		setGroups([...groups, data.data]);
+		setModalVisible(false);
+		return;
+	}
+
+	const getUsers = async (query: string) => {
+		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
+		if (!token) return;
+
+		const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + query, {
+			headers: {
+				Authorization: token
+			}
+		});
+		return data.data.map((user: User) => {
+			return {
+				name: user.username,
+				value: user.id
+			}
+		});
 	}
 
 	const disconnect = async () => {
@@ -89,18 +105,45 @@ const Home = () => {
 					<View className="border-4 rounded-2xl border-[#D6955B] w-3/4 h-1/3 bg-white">
 						<InputField
 							title="Nom du groupe"
-							value=""
+							value={groupName}
 							placeholder="Nom du groupe"
-							handleChangeText={() => {}}
+							handleChangeText={(newGroupName: string) => {
+								setGroupName(newGroupName);
+							}}
 							otherStyles="mt-4 mx-4"
 						/>
-
+						<SelectSearch
+							options={options}
+							getOptions={getUsers}
+							search={true}
+							multiple={true}
+							debounce={500}
+							onChange={(option) => {
+								if (Array.isArray(option)) {
+									setSelectedOption(option)
+									return;
+								}
+								setSelectedOption([option]);
+							}}
+							placeholder={"Ajouter des membres"}
+							className={"mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl"}
+						/>
+						<PrimaryButton
+							title="Créer"
+							handlePress={addGroup}
+							containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
+						/>
+						<Pressable
+							className="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
+							onPress={() => setModalVisible(!modalVisible)}>
+							<Text>Fermer</Text>
+						</Pressable>
 					</View>
 				</View>
 			</Modal>
 			<Image
 				source={require("@/assets/svg/rond.svg")}
-				className=" fixed -top-12 -left-12 w-48 h-48"
+				className="fixed -top-12 -left-12 w-48 h-48"
 			/>
 
 			<View className="flex self-start w-full">
@@ -126,6 +169,7 @@ const Home = () => {
 				</View>
 			)}
 
+			<Navbar/>
 			<StatusBar style="auto"/>
 		</View>
 	)
