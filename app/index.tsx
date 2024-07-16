@@ -54,12 +54,13 @@ const Home = () => {
 		});
 	};
 
+
 	const disconnect = async () => {
 		await AsyncStorage.removeItem(COOKEYS.JWT_TOKEN);
 		setUser(null);
 		router.push('/login');
 		return;
-	};
+	}
 
 	return (
 		<View className="flex-1 items-center bg-white">
@@ -99,7 +100,7 @@ const Home = () => {
 						<PrimaryButton
 							title="Créer"
 							handlePress={addGroup}
-							containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
+							containerStyles="bg-[#D6955B] rounded-xl flex flex-row justify-center items-center mt-4 mx-4"
 						/>
 						<Pressable
 							className="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
@@ -110,7 +111,7 @@ const Home = () => {
 				</View>
 			</Modal>
 			<Image
-				source={require('@/assets/svg/rond.svg')}
+				source={require("@/assets/svg/rond.svg")}
 				className="fixed -top-12 -left-12 w-48 h-48"
 			/>
 
@@ -120,9 +121,11 @@ const Home = () => {
 					Hermal
 				</Text>
 
-				<PrimaryButton title="" handlePress={() => setModalVisible(true)}
-				               containerStyles={'ml-auto mt-16 mr-5 px-4 py-2 rounded-full'}>
-
+				<PrimaryButton title="" handlePress={() => setModalVisible(true)} containerStyles={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
+					<Image
+						source={require("@/assets/svg/plus.svg")}
+						className="w-2 h-2 aspect-square"
+					/>
 				</PrimaryButton>
 			</View>
 
@@ -133,8 +136,11 @@ const Home = () => {
 					{groups.map((group) => (
 						<View key={group.id} className="flex flex-col mb-4">
 							<Link href={`/groups/${group.id}`} className="flex flex-row items-center ml-6">
-								<Image src="../assets/images/profile.png" alt="profile"
-								       className="border-2 border-black rounded-full w-10 h-10"/>
+								<Image
+									source={require("@/assets/images/profile.png")}
+									alt="profile picture"
+									style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
+								/>
 								<Text className="text-2xl font-semibold ml-4">{group.name}</Text>
 							</Link>
 							<Text className="text-base text-gray-500 ml-20">{group.lastChat || 'No message send yet'}</Text>

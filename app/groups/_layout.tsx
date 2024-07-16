@@ -5,9 +5,7 @@ import { useGlobalContext } from '@/context/GlobalProvider';
 const GroupsLayout = () => {
 	const { user } = useGlobalContext();
 
-	if (!user) {
-		return <Redirect href="/" />;
-	}
+	if (!user) return <Redirect href="/" />;
 
 	return (
 		<>
