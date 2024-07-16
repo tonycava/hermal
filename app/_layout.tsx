@@ -24,6 +24,7 @@ const RootLayout = () => {
 			<Stack.Screen name="(auth)" options={{ headerShown: false }}></Stack.Screen>
 			<Stack.Screen name="index" options={{ headerShown: false }}></Stack.Screen>
 			<Stack.Screen name="groups" options={{ headerShown: false }}></Stack.Screen>
+			<Stack.Screen name="profile" options={{ headerShown: false }}></Stack.Screen>
 		</Stack>
 	</GlobalProvider>
 }
