@@ -102,7 +102,7 @@ const Home = () => {
 					setModalVisible(!modalVisible);
 				}}>
 				<View className="flex-1 justify-center items-center bg-white bg-opacity-50">
-					<View className="border-4 rounded-2xl border-[#D6955B] w-3/4 h-1/3 bg-white">
+					<View className="border-4 rounded-2xl border-[#D6955B] w-3/4 h-1/2 bg-white">
 						<InputField
 							title="Nom du groupe"
 							value={groupName}

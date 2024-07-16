@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import socket from '@/common/socket';
@@ -9,6 +9,7 @@ import api from '@/common/api';
 import { ApiResponse } from '@/common/interfaces/ApiResponse';
 import { useRoute } from '@react-navigation/core';
 import { useGlobalContext } from '@/context/GlobalProvider';
+import Navbar from "@/components/Navbar";
 
 
 type Chat = {
@@ -61,6 +62,10 @@ const Chat = () => {
 
 		return (
 			<View className="flex-1 items-center justify-center bg-white">
+				<Image
+					source={require("@/assets/svg/rond.svg")}
+					className="fixed -top-12 -left-12 w-48 h-48"
+				/>
 
 				<InputField value={content} otherStyles="text-black" title="test"
 				            handleChangeText={(content: string) => setContent(content)}/>
@@ -70,6 +75,7 @@ const Chat = () => {
 					return <Text key={i}>{chat.content}</Text>;
 				})}
 
+				<Navbar/>
 				<StatusBar style="auto"/>
 			</View>
 		);
