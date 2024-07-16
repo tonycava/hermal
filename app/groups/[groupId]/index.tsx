@@ -152,17 +152,25 @@ const Chat = () => {
 			<ScrollView className="flex-1">
 				{group && (
 					<View className="pt-14 flex flex-row items-center">
-						<img src='../../../assets/images/profile.png' alt="profile"
-							 className="border-2 border-black rounded-full w-10 h-10"/>
+						<Image
+							source={require("@/assets/images/profile.png")}
+							alt="profile picture"
+							style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
+						/>
 						<Text className="text-black text-lg font-bold ml-3">{group.name}</Text>
-						<button onClick={() => setModalVisible(true)}
-								className={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
+						<PrimaryButton
+							title=""
+							handlePress={() => setModalVisible(true)}
+							containerStyles={"flex items-center ml-auto mr-5 px-4 rounded-full"}
+						>
 							<Image
 								source={require("@/assets/svg/plus.svg")}
-								className="w-2 h-2 aspect-square"
+								alt="add"
+								style={{ width: 20, height: 20 }}
 							/>
-						</button>
+						</PrimaryButton>
 					</View>
+
 				)}
 				<View className="h-2 border-b-2 border-black"/>
 				{chats.map((chat, i) => {
@@ -187,7 +195,9 @@ const Chat = () => {
 					placeholder="Type your message here"
 					handleChangeText={(content: string) => setContent(content)}
 				/>
-				<PrimaryButton handlePress={sendMessage} title="Send" containerStyles={"ml-4 mt-2 w-14"} />
+				<PrimaryButton handlePress={sendMessage} title="Send" containerStyles={"ml-4 mt-2 w-14"}>
+					Send
+				</PrimaryButton>
 			</View>
 
 			<Navbar />

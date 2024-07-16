@@ -181,12 +181,12 @@ const Home = () => {
 					Hermal
 				</Text>
 
-				<button onClick={() => setModalVisible(true)} className={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
+				<PrimaryButton title="" handlePress={() => setModalVisible(true)} containerStyles={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
 					<Image
 						source={require("@/assets/svg/plus.svg")}
 						className="w-2 h-2 aspect-square"
 					/>
-				</button>
+				</PrimaryButton>
 			</View>
 
 			{groups.length === 0 ? (
@@ -196,8 +196,11 @@ const Home = () => {
 					{groups.map((group) => (
 						<View key={group.id} className="flex flex-col mb-4">
 							<Link href={`/groups/${group.id}`} className="flex flex-row items-center ml-6">
-								<img src='../assets/images/profile.png' alt="profile"
-									 className="border-2 border-black rounded-full w-10 h-10"/>
+								<Image
+									source={require("@/assets/images/profile.png")}
+									alt="profile picture"
+									style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
+								/>
 								<Text className="text-2xl font-semibold ml-4">{group.name}</Text>
 							</Link>
 							{lastChats[group.id] && (
