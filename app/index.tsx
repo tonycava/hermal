@@ -12,7 +12,6 @@ import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-sel
 import PrimaryButton from '@/components/PrimaryButton';
 import api from '@/common/api';
 import { ItemGroup } from '@/common/entities/Group';
-import { getConsoleOutput } from '@jest/console';
 
 
 const Home = () => {
@@ -116,15 +115,20 @@ const Home = () => {
 			/>
 
 			<View className="flex flex-row self-start w-full">
-				<Text
-					className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
+				<Text className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
 					Hermal
 				</Text>
 
-				<PrimaryButton title="" handlePress={() => setModalVisible(true)} containerStyles={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
+				<PrimaryButton
+					title=""
+					handlePress={() => setModalVisible(true)}
+					containerStyles={'flex items-center ml-auto translate-y-1/4 mt-16 mr-5 p-2 rounded-full'}
+				>
 					<Image
-						source={require("@/assets/svg/plus.svg")}
-						className="w-2 h-2 aspect-square"
+						source={require('@/assets/svg/plus.svg')}
+						alt="add"
+						style={{ width: 20, height: 30 }}
+						className="flex items-center"
 					/>
 				</PrimaryButton>
 			</View>
@@ -139,7 +143,7 @@ const Home = () => {
 								<Image
 									source={require("@/assets/images/profile.png")}
 									alt="profile picture"
-									style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
+									style={{ width: 40, height: 40, borderRadius: 100, borderWidth: 2, borderColor: 'black' }}
 								/>
 								<Text className="text-2xl font-semibold ml-4">{group.name}</Text>
 							</Link>

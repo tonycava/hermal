@@ -1,6 +1,6 @@
 import { Image, Text, View, ScrollView, Alert, Pressable, Modal } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import socket from '@/common/socket';
 import { WsEvent } from '@/common/Event';
 import InputField from '@/components/InputField';
@@ -13,6 +13,7 @@ import Navbar from '@/components/Navbar';
 import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
 import { useRouter } from 'expo-router';
 import { Group } from '@/common/entities/Group';
+import { ItemChat } from "@/common/entities/Chat";
 
 type Chat = {
 	id: string;
@@ -27,11 +28,13 @@ const Chat = () => {
 	const router = useRouter();
 	const { groupId } = route.params as { groupId: string };
 	const [content, setContent] = useState<string>('');
-	const [chats, setChats] = useState<Chat[]>([]);
+	const [chats, setChats] = useState<ItemChat[]>([]);
 	const [group, setGroup] = useState<Group>();
 	const [modalVisible, setModalVisible] = useState(false);
 	const [options, setOptions] = useState<SelectSearchOption[]>([]);
 	const [selectedOption, setSelectedOption] = useState<SelectedOptionValue[]>([]);
+
+	const scrollView = useRef<ScrollView>(null);
 
 	const sendMessage = () => {
 		const chat: Omit<Chat, 'id'> = {
@@ -41,7 +44,7 @@ const Chat = () => {
 		};
 		socket.emit(WsEvent.CHAT_SEND, chat);
 
-		setChats((chats) => [...chats, { id: '', ...chat }]);
+		setChats((chats) => [...chats, { id: '', username: user?.username!, ...chat }]);
 		setContent('');
 	};
 
@@ -62,7 +65,7 @@ const Chat = () => {
 	}, []);
 
 	useEffect(() => {
-		socket.on(WsEvent.SEND_CHAT, (chat: Chat) => {
+		socket.on(WsEvent.SEND_CHAT, (chat: ItemChat) => {
 			setChats((chats) => [...chats, chat]);
 		});
 		return () => {
@@ -114,10 +117,12 @@ const Chat = () => {
 							className={'mt-4 mx-4 border-4 border-[#D6955B] rounded-2xl'}
 						/>
 						<PrimaryButton
-							title="Ajouter"
+							title=""
 							handlePress={addUserToGroup}
 							containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
-						/>
+						>
+							Ajouter
+						</PrimaryButton>
 						<Pressable
 							className="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
 							onPress={() => setModalVisible(!modalVisible)}>
@@ -130,41 +135,44 @@ const Chat = () => {
 				source={require('@/assets/svg/rond.svg')}
 				className="fixed -top-12 -left-12 w-48 h-48"
 			/>
-			<ScrollView className="flex-1">
-				{group && (
-					<View className="pt-14 flex flex-row items-center">
+			{group && (
+				<View className="pt-14 flex flex-row items-center">
+					<Image
+						source={require('@/assets/images/profile.png')}
+						alt="profile picture"
+						style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
+					/>
+					<Text className="text-black text-lg font-bold ml-3">{group.name}</Text>
+					<PrimaryButton
+						title=""
+						handlePress={() => router.replace('/')}
+						containerStyles='flex items-center ml-auto mr-5 p-2 rounded-full rotate-180'
+					>
 						<Image
-							source={require('@/assets/images/profile.png')}
-							alt="profile picture"
-							style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: 'black' }}
-						/>
-						<Text className="text-black text-lg font-bold ml-3">{group.name}</Text>
-						<PrimaryButton
-							title=""
-							handlePress={() => router.replace('/')}
-							containerStyles='flex items-center ml-auto mr-5 px-4 rounded-full rotate-180'
-						>
-							<Image
-								source={require('@/assets/svg/arrow.svg')}
-								alt="add"
-								style={{ width: 20, height: 20 }}
-							/>
-						</PrimaryButton>
-						<PrimaryButton
-							title=""
-							handlePress={() => setModalVisible(true)}
-							containerStyles={'flex items-center mr-5 px-4 rounded-full'}
-						>
-							<Image
-								source={require('@/assets/svg/plus.svg')}
-								alt="add"
-								style={{ width: 20, height: 20 }}
-							/>
-						</PrimaryButton>
-					</View>
+							source={require('@/assets/svg/arrow.svg')}
+							alt="add"
+							style={{ width: 20, height: 30 }}
+							className="flex items-center ml-auto object-cover"
 
-				)}
-				<View className="h-2 border-b-2 border-black"/>
+						/>
+					</PrimaryButton>
+					<PrimaryButton
+						title=""
+						handlePress={() => setModalVisible(true)}
+						containerStyles={'flex items-center mr-5 p-2 rounded-full'}
+					>
+						<Image
+							source={require('@/assets/svg/plus.svg')}
+							alt="add"
+							style={{ width: 20, height: 30 }}
+							className="flex items-center"
+						/>
+					</PrimaryButton>
+				</View>
+
+			)}
+			<View className="h-2 border-b-2 border-black"/>
+			<ScrollView className="flex-1" ref={scrollView} onContentSizeChange={() => scrollView.current?.scrollToEnd({animated: true})}>
 				{chats.length === 0 && <Text className="text-2xl text-center mt-4">No messages have been send yet !</Text>}
 				{chats.map((chat, i) => {
 					const isCurrentUser = chat.userId === user?.id;
@@ -175,6 +183,7 @@ const Chat = () => {
 								isCurrentUser ? 'bg-blue-100 self-end' : 'bg-gray-200 self-start'
 							}`}
 						>
+							<Text className="text-black font-bold">{chat.username}</Text>
 							<Text className="text-black">{chat.content}</Text>
 						</View>
 					);
@@ -188,7 +197,7 @@ const Chat = () => {
 					placeholder="Type your message here"
 					handleChangeText={(content: string) => setContent(content)}
 				/>
-				<PrimaryButton handlePress={sendMessage} title="Send" containerStyles={'ml-4 mt-2 w-14'}>
+				<PrimaryButton handlePress={sendMessage} title="Send" containerStyles={'ml-4 mt-2 w-14 p-4'}>
 					Send
 				</PrimaryButton>
 			</View>

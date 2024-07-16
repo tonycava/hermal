@@ -1,7 +1,10 @@
 type Chat = {
 	id: string;
 	content: string;
-	createdAt: string;
 	userId: string;
 	groupId: string;
 }
+
+export type ItemChat = {
+	username: string,
+} & Chat;

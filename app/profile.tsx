@@ -2,13 +2,15 @@ import { Image, Text, View } from "react-native";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { Redirect } from "expo-router";
 import Navbar from "@/components/Navbar";
-import React from "react";
+import React, { useState } from "react";
 import InputField from "@/components/InputField";
 import PrimaryButton from "@/components/PrimaryButton";
+import { ItemGroup } from "@/common/entities/Group";
 
 const Profile = () => {
     const { user, setUser } = useGlobalContext();
     if (!user) return <Redirect href="/login"/>;
+    const [username, setUsername] = useState<string>(user.username);
 
     return (
         <View className="flex-1 items-center bg-white">
@@ -24,9 +26,8 @@ const Profile = () => {
                         alt="profile picture"
                         style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 2, borderColor: 'black' }}
                     />
-                    <InputField title="Username" value={user.username} placeholder="Username" handleChangeText={(name: string) => setUser({ ...user, name })} otherStyles="mt-4"/>
+                    <InputField title="Username" value={username} placeholder="Username" handleChangeText={(username: string) => setUsername(username)} otherStyles="mt-4"/>
                     <PrimaryButton title="Save" handlePress={() => {}} containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] mt-4 mx-4">
-                        <Text>Save</Text>
                     </PrimaryButton>
                 </View>
             </View>

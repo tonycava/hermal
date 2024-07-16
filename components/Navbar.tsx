@@ -7,7 +7,7 @@ const Navbar = () => {
         <View style={styles.navbar}>
             <TouchableOpacity style={styles.navItem}>
                 <Link href={'/'}>
-                    <Image src='../assets/icons/home.png' alt="home" className='w-8 h-8'/>
+                    <Image  source={require("@/assets/icons/home.png")} alt="home" className='w-8 h-8 scale-50'/>
                 </Link>
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem}>
@@ -17,7 +17,11 @@ const Navbar = () => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem}>
                 <Link href={'/profile'}>
-                    <Image src='../assets/images/profile.png' alt="profile" className="border-2 border-black rounded-full w-10 h-10"/>
+                    <Image
+                        source={require("@/assets/images/profile.png")}
+                        alt="profile picture"
+                        style={{ width: 40, height: 40, borderRadius: 100, borderWidth: 2, borderColor: 'black' }}
+                    />
                 </Link>
             </TouchableOpacity>
         </View>

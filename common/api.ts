@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COOKEYS } from '@/common/utils';
 
 const api = axios.create({
-	baseURL: 'http://10.31.37.161:3000',
+	baseURL: 'http://localhost:3000',
 	headers: { 'Content-Type': 'application/json', },
 });
 
