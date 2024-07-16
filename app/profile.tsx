@@ -2,6 +2,9 @@ import { Image, Text, View } from "react-native";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { Redirect } from "expo-router";
 import Navbar from "@/components/Navbar";
+import React from "react";
+import InputField from "@/components/InputField";
+import PrimaryButton from "@/components/PrimaryButton";
 
 const Profile = () => {
     const { user, setUser } = useGlobalContext();
@@ -14,18 +17,19 @@ const Profile = () => {
                 className=" fixed -top-12 -left-12 w-48 h-48"
             />
 
-            <div className="m-8 mt-16 w-full h-full">
-                <div className="flex flex-col w-full h-full items-center">
-                    <img
-                        src="../assets/images/profile.png"
+            <View className="m-8 mt-16 w-full h-full">
+                <View className="flex flex-col w-full h-full items-center">
+                    <Image
+                        source={require("@/assets/images/profile.png")}
                         alt="profile picture"
-                        className="border-2 border-black rounded-full w-20 h-20"
+                        style={{ width: 80, height: 80, borderRadius: 100, borderWidth: 2, borderColor: 'black' }}
                     />
-                    <h2 className="text-secondary mt-4 text-2xl font-poppins-medium">
-                        {user.username}
-                    </h2>
-                </div>
-            </div>
+                    <InputField title="Username" value={user.username} placeholder="Username" handleChangeText={(name: string) => setUser({ ...user, name })} otherStyles="mt-4"/>
+                    <PrimaryButton title="Save" handlePress={() => {}} containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] mt-4 mx-4">
+                        <Text>Save</Text>
+                    </PrimaryButton>
+                </View>
+            </View>
             <Navbar></Navbar>
         </View>
     )
