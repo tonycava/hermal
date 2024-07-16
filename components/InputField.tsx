@@ -1,13 +1,13 @@
-import React, { InputHTMLAttributes, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleProp } from "react-native";
+import React, { InputHTMLAttributes, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleProp } from 'react-native';
 
-import { icons } from "../constants";
+import { icons } from '../constants';
 
 type InputFieldProps = {
 	title: string;
 	value: string;
 	placeholder: string;
-	type: "text" | "password";
+	type: 'text' | 'password';
 	handleChangeText: (text: string) => void;
 	otherStyle?: string;
 } & InputHTMLAttributes<HTMLInputElement>
@@ -18,7 +18,7 @@ const InputField = ({
 	                    placeholder,
 	                    handleChangeText,
 	                    otherStyles,
-	                    type = "text",
+	                    type = 'text',
 	                    ...props
                     }: any) => {
 	const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -31,20 +31,16 @@ const InputField = ({
 				className="w-full h-16 px-4 rounded-2xl border-[#18534F] border-4 flex flex-row items-center">
 				<TextInput
 					className="flex-1 text-black font-semibold text-base outline-none"
-					style={
-						{
-							width: "97%",
-						}
-					}
+					style={{ width: '97%' }}
 					value={value}
 					placeholder={placeholder}
 					placeholderTextColor="#7B7B8B"
 					onChangeText={handleChangeText}
-					secureTextEntry={type === "password" && !showPassword}
+					secureTextEntry={type === 'password' && !showPassword}
 					{...props}
 				/>
 
-				{(title === "Password" || title === "Confirm Password") && (
+				{(title === 'Password' || title === 'Confirm Password') && (
 					<TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
 						<Image
 							source={!showPassword ? icons.eye : icons.eyeHide}

@@ -3,8 +3,9 @@ import { StatusBar } from "expo-status-bar";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const AuthLayout = () => {
-	const { user } = useGlobalContext();
-	if (user) return <Redirect href="/" />;
+	// const { user } = useGlobalContext();
+	// if (user) return <Redirect href="/" />;
+    console.log("hermal: layout");
 
 	return (
 		<>
