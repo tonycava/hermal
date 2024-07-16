@@ -6,12 +6,12 @@ import { View, Text, ScrollView, Dimensions, Image } from "react-native";
 import InputField from "@/components/InputField";
 import PrimaryButton from "@/components/PrimaryButton";
 import { RegisterForm } from "@/common/dto/auth.dto";
-import axios from "axios";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COOKEYS } from "@/common/utils";
 import { jwtDecode } from "jwt-decode";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import api from "@/common/api";
 
 type RegisterError = {
 	username?: string;
@@ -31,7 +31,7 @@ const Register = () => {
 		setSubmitting(true);
 
 		try {
-			const { data } = await axios.post<ApiResponse>('http://localhost:3000/auth/register', form);
+			const { data } = await api.post<ApiResponse>('http://localhost:3000/auth/register', form);
 
 			console.log(data);
 			if (!data.isSuccess) {

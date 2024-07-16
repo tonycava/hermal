@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { Link, router } from 'expo-router';
 import { View, Text, Dimensions, Image } from 'react-native';
 
-import InputField from '@/components/InputField';
-import CustomButton from '@/components/PrimaryButton';
-import { LoginForm } from '@/common/dto/auth.dto';
-import { ApiResponse } from '@/common/interfaces/ApiResponse';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { COOKEYS } from '@/common/utils';
-import { useGlobalContext } from '@/context/GlobalProvider';
-import { jwtDecode } from 'jwt-decode';
-import api from '@/common/api';
+import InputField from "@/components/InputField";
+import CustomButton from "@/components/PrimaryButton";
+import { LoginForm } from "@/common/dto/auth.dto";
+import { ApiResponse } from "@/common/interfaces/ApiResponse";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COOKEYS } from "@/common/utils";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { jwtDecode } from "jwt-decode";
+import { io } from "socket.io-client";
+import api from "@/common/api";
 
 type LoginError = {
 	email?: string;
@@ -32,9 +33,9 @@ const Login = () => {
 			const { data } = await api.post<ApiResponse>('/auth/login', form);
 			if (data.status === 400) {
 				setError({
-					email: data.data['email'],
-					password: data.data['password'],
-					server: ''
+					email: data.data["email"],
+					password: data.data["password"],
+					server: ""
 				});
 
 				setSubmitting(false);
@@ -47,13 +48,13 @@ const Login = () => {
 			setSubmitting(false);
 			router.push('/');
 		} catch (error) {
-			console.log(JSON.stringify(error));
-			console.log('Error', error);
+			console.log("Error", error);
+
 			setError({
-				email: '',
-				password: '',
-				server: 'Internal server error, please try again later.'
-			});
+				email: "",
+				password: "",
+				server: "Internal server error, please try again later."
+			})
 
 			setSubmitting(false);
 		}
