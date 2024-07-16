@@ -48,7 +48,7 @@ const Register = () => {
 			}
 
 			await AsyncStorage.setItem(COOKEYS.JWT_TOKEN, data.data);
-			const user = jwtDecode(data.data);
+			const user = jwtDecode<User | null>(data.data);
 			setUser(user);
 			setSubmitting(false);
 			router.push("/");

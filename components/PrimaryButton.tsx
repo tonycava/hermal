@@ -1,4 +1,5 @@
-import { ActivityIndicator, StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import { FC } from 'react';
 
 type CustomButtonProps = {
 	title: string;
@@ -8,13 +9,13 @@ type CustomButtonProps = {
 	isLoading?: boolean;
 }
 
-const CustomButton = ({
+const CustomButton: FC<CustomButtonProps> = ({
 	                      title,
 	                      handlePress,
 	                      containerStyles,
 	                      textStyles,
 	                      isLoading,
-                      }: CustomButtonProps) => {
+                      }) => {
 	return (
 		<TouchableOpacity
 			onPress={handlePress}

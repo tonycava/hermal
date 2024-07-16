@@ -1,15 +1,15 @@
-import { Alert, Image, Modal, Pressable, Text, View } from "react-native";
+import { Alert, Image, Modal, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Link, Redirect, router } from "expo-router";
+import { Link, Redirect, router } from 'expo-router';
 import { useGlobalContext } from "@/context/GlobalProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COOKEYS } from "@/common/utils";
-import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
 import { useEffect, useState } from "react";
 import InputField from "@/components/InputField";
-import SelectSearch from 'react-select-search';
+import api from '@/common/api';
+import PrimaryButton from '@/components/PrimaryButton';
 
 type Group = {
 	id: string;
@@ -23,6 +23,8 @@ type User = {
 
 const Home = () => {
 	const { user, setUser } = useGlobalContext();
+	if (!user) return <Redirect href="/login" />;
+
 	const [groups, setGroups] = useState<Group[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [searchUser, setSearchUser] = useState<string>('');
@@ -30,22 +32,13 @@ const Home = () => {
 
 	useEffect(() => {
 		const getGroups = async () => {
-			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-			if (!token) return;
-
-			const {data} = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
-				headers: {
-					Authorization: token
-				}
-			});
+			const {data} = await api.get<ApiResponse<any>>('/chats/groups');
 
 			console.log(data.data);
 			setGroups(data.data);
 		}
 		getGroups();
 	}, []);
-
-	if (!user) return <Redirect href="/login"/>;
 
 	const options = [
 		{name: 'Swedish', value: 'sv'},
@@ -57,9 +50,7 @@ const Home = () => {
 		if (!token) return;
 
 		const {data} = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
-			headers: {
-				Authorization: token
-			}
+			headers: { Authorization: token }
 		});
 
 		console.log(data.data);
@@ -103,12 +94,7 @@ const Home = () => {
 							handleChangeText={() => {}}
 							otherStyles="mt-4 mx-4"
 						/>
-						<SelectSearch options={options} search={true} multiple={true} onChange={() => {console.log('change');}} className="mt-4 mx-4"/>
-						<Pressable
-							className="bg-[#D6955B] rounded-xl min-h-[62px] flex flex-row justify-center items-center mt-4 mx-4"
-							onPress={() => setModalVisible(!modalVisible)}>
-							<Text>Fermer</Text>
-						</Pressable>
+
 					</View>
 				</View>
 			</Modal>
@@ -117,19 +103,16 @@ const Home = () => {
 				className=" fixed -top-12 -left-12 w-48 h-48"
 			/>
 
-			<div className="flex self-start w-full">
+			<View className="flex self-start w-full">
 				<Text className="flex self-start justify-center text-3xl font-semibold text-[#D6955B] mt-20 ml-2 font-psemibold">
 					Hermal
 				</Text>
 
 
-				<button onClick={() => setModalVisible(true)} className={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
-					<Image
-						source={require("@/assets/svg/plus.svg")}
-						className="w-2 h-2 aspect-square"
-					/>
-				</button>
-			</div>
+				<PrimaryButton handlePress={() => setModalVisible(true)} containerStyles="ml-auto mt-16 mr-5 px-4 py-2 rounded-full" title="test">
+
+				</PrimaryButton>
+			</View>
 
 			{groups.length === 0 ? (
 				<Text className="text-2xl font-semibold mt-10">Pas de groupe</Text>
@@ -143,7 +126,6 @@ const Home = () => {
 				</View>
 			)}
 
-			<Navbar></Navbar>
 			<StatusBar style="auto"/>
 		</View>
 	)

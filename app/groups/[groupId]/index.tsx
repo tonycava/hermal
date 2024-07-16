@@ -2,13 +2,13 @@ import { Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import socket from '@/common/socket';
-import { WsEvent } from '@/common/Event';
 import InputField from '@/components/InputField';
 import PrimaryButton from '@/components/PrimaryButton';
 import api from '@/common/api';
 import { ApiResponse } from '@/common/interfaces/ApiResponse';
 import { useRoute } from '@react-navigation/core';
 import { useGlobalContext } from '@/context/GlobalProvider';
+import { WsEvent } from '@/common/Event';
 
 
 type Chat = {
@@ -26,6 +26,7 @@ const Chat = () => {
 		const [chats, setChats] = useState<Chat[]>([]);
 
 		const sendMessage = () => {
+			if (!content) return;
 			const chat: Omit<Chat, 'id'> = {
 				content,
 				groupId,
@@ -39,9 +40,7 @@ const Chat = () => {
 
 		useEffect(() => {
 			const getChats = async () => {
-
 				const res = await api.get<ApiResponse<any>>(`/chats/${groupId}`);
-
 				setChats(res.data.data);
 			};
 
@@ -56,7 +55,7 @@ const Chat = () => {
 			return () => {
 				socket.off(WsEvent.SEND_CHAT);
 			};
-		}, [socket]);
+		}, []);
 
 
 		return (
