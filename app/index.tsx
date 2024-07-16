@@ -5,12 +5,12 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COOKEYS } from "@/common/utils";
 import Navbar from "@/components/Navbar";
-import axios from "axios";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "@/components/InputField";
 import SelectSearch, { SelectedOptionValue, SelectSearchOption } from 'react-select-search';
 import PrimaryButton from "@/components/PrimaryButton";
+import api from "@/common/api";
 
 type Group = {
 	id: string;
@@ -22,27 +22,56 @@ type User = {
 	username: string;
 }
 
+type Chat = {
+	id: string;
+	content: string;
+	createdAt: string;
+}
+
 const Home = () => {
 	const { user, setUser } = useGlobalContext();
 	const [groups, setGroups] = useState<Group[]>([]);
+	const [lastChats, setLastChats] = useState<{ [key: string]: Chat | null }>({});
 	const [modalVisible, setModalVisible] = useState(false);
 	const [groupName, setGroupName] = useState<string>('');
 	const [options, setOptions] = useState<SelectSearchOption[]>([]);
 	const [selectedOption, setSelectedOption] = useState<SelectedOptionValue[]>([]);
 
 	useEffect(() => {
-		const getGroups = async () => {
+		const getChatsFromGroup = async (groupId: string): Promise<Chat | null> => {
 			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
-			if (!token) return;
+			if (!token) return null;
 
-			const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
+			const { data } = await api.get<ApiResponse<any>>('http://localhost:3000/chats/' + groupId, {
 				headers: {
 					Authorization: token
 				}
 			});
 
-			console.log(data.data);
+			if (data.data.length === 0) return null;
+
+			// Trier les chats par createdAt pour trouver le plus récent
+			const sortedChats = data.data.sort((a: Chat, b: Chat) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+			return sortedChats[0];
+		}
+
+		const getGroups = async () => {
+			const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
+			if (!token) return;
+
+			const { data } = await api.get<ApiResponse<any>>('http://localhost:3000/chats/groups', {
+				headers: {
+					Authorization: token
+				}
+			});
+
 			setGroups(data.data);
+
+			// Récupérez le dernier chat pour chaque groupe
+			data.data.forEach(async (group: Group) => {
+				const lastChat = await getChatsFromGroup(group.id);
+				setLastChats(prev => ({ ...prev, [group.id]: lastChat }));
+			});
 		}
 		getGroups();
 	}, []);
@@ -53,7 +82,7 @@ const Home = () => {
 		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
 		if (!token) return;
 
-		const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
+		const { data } = await api.post<ApiResponse<any>>('http://localhost:3000/chats/groups/create', {
 			name: groupName,
 			users: [...selectedOption, user.id]
 		}, {
@@ -71,7 +100,7 @@ const Home = () => {
 		const token = await AsyncStorage.getItem(COOKEYS.JWT_TOKEN);
 		if (!token) return;
 
-		const { data } = await axios.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + query, {
+		const { data } = await api.get<ApiResponse<any>>('http://localhost:3000/chats/search-user?searchTerm=' + query, {
 			headers: {
 				Authorization: token
 			}
@@ -152,7 +181,6 @@ const Home = () => {
 					Hermal
 				</Text>
 
-
 				<button onClick={() => setModalVisible(true)} className={"ml-auto mt-16 mr-5 px-4 py-2 rounded-full"}>
 					<Image
 						source={require("@/assets/svg/plus.svg")}
@@ -164,17 +192,24 @@ const Home = () => {
 			{groups.length === 0 ? (
 				<Text className="text-2xl font-semibold mt-10">Pas de groupe</Text>
 			) : (
-				<View className="flex flex-col mt-10">
+				<View className="flex flex-col mt-10 w-full">
 					{groups.map((group) => (
-						<Link href={`/groups/${group.id}`} key={group.id}>
-							<Text className="text-2xl font-semibold">{group.name}</Text>
-						</Link>
+						<View key={group.id} className="flex flex-col mb-4">
+							<Link href={`/groups/${group.id}`} className="flex flex-row items-center ml-6">
+								<img src='../assets/images/profile.png' alt="profile"
+									 className="border-2 border-black rounded-full w-10 h-10"/>
+								<Text className="text-2xl font-semibold ml-4">{group.name}</Text>
+							</Link>
+							{lastChats[group.id] && (
+								<Text className="text-base text-gray-500 ml-20">{lastChats[group.id]?.content}</Text>
+							)}
+						</View>
 					))}
 				</View>
 			)}
 
-			<Navbar/>
-			<StatusBar style="auto"/>
+			<Navbar />
+			<StatusBar style="auto" />
 		</View>
 	)
 }

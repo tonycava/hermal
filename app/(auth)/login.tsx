@@ -9,10 +9,10 @@ import { LoginForm } from "@/common/dto/auth.dto";
 import { ApiResponse } from "@/common/interfaces/ApiResponse";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COOKEYS } from "@/common/utils";
-import axios from "axios"
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { jwtDecode } from "jwt-decode";
 import { io } from "socket.io-client";
+import api from "@/common/api";
 
 type LoginError = {
 	email?: string;
@@ -35,7 +35,7 @@ const Login = () => {
 		setSubmitting(true);
 
 		try {
-			const { data } = await axios.post<ApiResponse<any>>('http://localhost:3000/auth/login', form);
+			const { data } = await api.post<ApiResponse<any>>('http://localhost:3000/auth/login', form);
 
 			console.log(data)
 			if (data.status === 400) {
