@@ -100,7 +100,7 @@ const Login = () => {
 					handlePress={onLogin}
 					containerStyles="mt-7"
 					isLoading={isSubmitting}
-				/>
+				>Login</CustomButton>
 
 				<Text>{error?.server ?? ''}</Text>
 
