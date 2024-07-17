@@ -28,6 +28,7 @@ const Profile = () => {
                     />
                     <InputField title="Username" value={username} placeholder="Username" handleChangeText={(username: string) => setUsername(username)} otherStyles="mt-4"/>
                     <PrimaryButton title="Save" handlePress={() => {}} containerStyles="bg-[#D6955B] rounded-xl min-h-[62px] mt-4 mx-4">
+                        Modify
                     </PrimaryButton>
                 </View>
             </View>
