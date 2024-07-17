@@ -134,7 +134,7 @@ const Register = () => {
 						handlePress={onRegister}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
-					/>
+					>Register</PrimaryButton>
 
 					<Text>{error?.server ?? ""}</Text>
 
